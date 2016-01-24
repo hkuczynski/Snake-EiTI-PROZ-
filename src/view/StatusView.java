@@ -6,23 +6,27 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created by hubert on 22.01.2016.
+ * Widok statusu. Zawiera on informację o ilości zdobytych punktów.
  */
 public class StatusView extends JPanel
 {
-    private final int WIDTH = 600;
-    private final int HEIGHT = 50;
+    public static final int WIDTH = 600;  // szerokość panelu
+    public static final int HEIGHT = 50; // wysokość panelu
+    private static final Font FONT = new Font("Tahoma", Font.BOLD, 25);
+
     private final ArenaModel arenaModel;
+    private JLabel scoreLabel;
+    private int score;
 
-    private JLabel scoreLabel, livesLabel;
-    private int score, lives;
-
-
+    /*
+     * Konstruktor StatusView przyjmuje jako argument arenaModel, z którego będzie pobierał
+     * ilość zdobytych punktów
+     */
     public StatusView(ArenaModel arenaModel)
     {
         this.arenaModel = arenaModel;
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setBackground(Color.BLUE);
+        setBackground(new Color(175, 208, 139));
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -32,23 +36,14 @@ public class StatusView extends JPanel
         gbc.gridy = 0;
         add(scoreLabel, gbc);
 
-        livesLabel = new JLabel();
-        gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        add(livesLabel, gbc);
-
         update();
     }
 
     public void update()
     {
         score = arenaModel.getScore();
-        lives = arenaModel.getLives();
-
         scoreLabel.setText("Score: " + score);
-        livesLabel.setText("Lives: " + lives);
+        scoreLabel.setFont(FONT);
+        scoreLabel.setForeground(new Color(54, 57, 27));
     }
-
-
 }

@@ -5,58 +5,44 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created by hubert on 22.01.2016.
+ * Główny widok programu.
  */
 public class MainView extends JFrame
 {
-    private final ArenaView arenaView;
-    private final StatusView statusView;
-
     private final JPanel contentPanel;
 
+    /*
+     * Konstruktor MainView przyjmuje jako argumenty widoki, ktore będzie wyświetlał
+     */
     public MainView(ArenaView arenaView, StatusView statusView)
     {
-        this.arenaView = arenaView;
-        this.statusView = statusView;
         contentPanel = new JPanel();
 
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Snake by Hubert");
+        setTitle("Snake");
         setResizable(false);
         add(contentPanel);
 
-
-        init();
-    }
-
-    private void init()
-    {
         contentPanel.setLayout(new GridBagLayout());
+        contentPanel.setBackground(new Color(175, 208, 139));
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // Setting arenaView location
+        // Ustawianie położenia ArenaView
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
         contentPanel.add(arenaView,gbc);
 
-        // Setting statusView location
+        // Ustawianie położenia statusView
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 2;
         contentPanel.add(statusView,gbc);
 
         pack();
-
-
         setLayout(new GridLayout(1, 1, 0, 0));
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
-
-
-
 }

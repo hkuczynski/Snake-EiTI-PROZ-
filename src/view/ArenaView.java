@@ -1,78 +1,145 @@
 package view;
 
 import controller.ButtonsListener;
-import model.ArenaModel;
-import model.Food;
-import model.Snake;
+import model.*;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Created by hubert on 22.01.2016.
+ * Widok pola rozgrywki.
  */
 public class ArenaView extends JPanel
 {
-    private final int WIDTH = 600;
-    private final int HEIGHT = 600;
-
+    public static final int WIDTH = 620; // szerokość panelu
+    public static final int HEIGHT = 620; // wysokość panelu
+    private static final Font FONT = new Font("Tahoma", Font.BOLD, 25);
+    private static final Color FONT_COLOR = new Color(54, 57, 27);
     private final ArenaModel arenaModel;
-    java.io.File groundTexture    = new  java.io.File("textures/grass.png");
 
+    /*
+     * Konstruktor ArenaView przyjmuje jako argument arenaModel, z którego pobiera wszystkie potrzebne informacje
+     * np. instancję węża.
+     */
     public ArenaView(ArenaModel arenaModel)
     {
-        setFocusable(true);
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setBackground(Color.LIGHT_GRAY);
-
         this.arenaModel = arenaModel;
 
+        setFocusable(true);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setBorder(new LineBorder(new Color(54, 57, 27), 5));
+        setBackground(new Color(143, 182, 103));
     }
 
-    public void paintComponent(Graphics g)
-    {
-        System.out.println("sss");
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        if (g2 == null) {
-            System.out.println("error");
-            return;
-        }
-        try {
-            BufferedImage mImage = ImageIO.read(groundTexture);
-            java.awt.geom.Rectangle2D tr = new java.awt.geom.Rectangle2D.Double(0, 0, mImage.getWidth(), mImage.getHeight());
-            TexturePaint tp = new TexturePaint(mImage, tr);
-            g2.setPaint(tp);
-            java.awt.geom.Rectangle2D r = (java.awt.geom.Rectangle2D) this.getBounds();
-            g2.fill(r);
-        } catch (java.io.IOException ex) {
-        }
-    }
-
+    /*
+     * Funkcja rysująca elementy takie jak: Snake, Fruit oraz wyśietlająca w razie potrzeby
+     * informacje o stanie gry (początek, pauza, koniec).
+     */
     public void paint(Graphics g)
     {
-        Snake snake = arenaModel.getSnake();
-        ArrayList<Food> foodList = arenaModel.getFoodList();
-        g.setColor(Color.black);
+        GameState gameState = arenaModel.getGameState();
 
-        for(int i = 0; i < snake.getSize(); i++)
-        {
-            snake.getPart(i).draw(g);
-        }
+        super.paint(g);
 
-        for(int i = 0; i < foodList.size(); i++)
+        switch(gameState)
         {
-            foodList.get(i).draw(g);
+            case STARTED:
+                showStartingMessage(g);
+                break;
+            case PAUSED:
+                showPauseMessage(g);
+                break;
+            case ENDED:
+                showEndMessage(g);
+                break;
+            case RUNNING:
+                draw(g);
+                break;
         }
     }
 
-    public void addBindings(ButtonsListener l) {
-        InputMap inputMap = this.getInputMap();
+    private void draw(Graphics g)
+    {
+        Snake snake = arenaModel.getSnake();
+        BodyPart snakePart;
+        ArrayList<Fruit> fruitList = arenaModel.getFruitList();
+        int xCoor, yCoor;
+
+        for (int i = 0; i < snake.getSize(); i++)
+        {
+            snakePart = snake.getPart(i);
+            xCoor = snakePart.getxCoor();
+            yCoor = snakePart.getyCoor();
+
+            g.setColor(BodyPart.BORDER_COLOR);
+            g.fillOval(xCoor * BodyPart.SIZE, yCoor * BodyPart.SIZE, BodyPart.SIZE, BodyPart.SIZE);
+            g.setColor(BodyPart.BACKGROUND_COLOR);
+            g.fillOval(xCoor * BodyPart.SIZE + 2, yCoor * BodyPart.SIZE + 2, BodyPart.SIZE - 4, BodyPart.SIZE - 4);
+        }
+
+        for (int i = 0; i < fruitList.size(); i++)
+        {
+            xCoor = fruitList.get(i).getxCoor();
+            yCoor = fruitList.get(i).getyCoor();
+
+            g.setColor(Fruit.BORDER_COLOR);
+            g.fillOval(xCoor * Fruit.SIZE, yCoor * Fruit.SIZE, Fruit.SIZE, Fruit.SIZE);
+            g.setColor(Fruit.BACKGROUND_COLOR);
+            g.fillOval(xCoor * Fruit.SIZE + 2, yCoor * Fruit.SIZE + 2, Fruit.SIZE - 4, Fruit.SIZE - 4);
+        }
+    }
+
+    /*
+     * Funkcja wyświetlająca napisy poitalne.
+     */
+    private void showStartingMessage(Graphics g)
+    {
+        String largeMessage = "Press ENTER to play";
+
+        g.setFont(FONT);
+        g.setColor(FONT_COLOR);
+        g.drawString(largeMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(largeMessage) / 2, HEIGHT / 2 - 50);
+    }
+
+    /*
+     * Funkcja wyświetlająca napisy w trakcie wstrzymania rozgrywki.
+     */
+    private void showPauseMessage(Graphics g)
+    {
+        String largeMessage = "Game Paused";
+        String smallMessage = "Press SPACE to resume";
+
+        g.setFont(FONT);
+        g.setColor(FONT_COLOR);
+        g.drawString(largeMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(largeMessage) / 2, HEIGHT / 2 - 50);
+        g.drawString(smallMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(smallMessage) / 2, HEIGHT / 2 + 50);
+    }
+
+    /*
+     * Funkcja wyświtlająca napisy po porażce.
+     */
+    private void showEndMessage(Graphics g)
+    {
+        String largeMessage = "Game Over";
+        String smallMessage = "Press ENTER to play again";
+
+        g.setFont(FONT);
+        g.setColor(FONT_COLOR);
+        g.drawString(largeMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(largeMessage) / 2, HEIGHT / 2 - 50);
+        g.drawString(smallMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(smallMessage) / 2, HEIGHT / 2 + 50);
+    }
+
+    /*
+     * Funkcja przypisująca akcje dla konkretnych klawiszy
+     */
+    public void addBindings(ButtonsListener l)
+    {
+        InputMap inputMap = getInputMap();
+        ActionMap actionMap = getActionMap();
 
         // UP key
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0);
@@ -94,7 +161,11 @@ public class ArenaView extends JPanel
         key = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
         inputMap.put(key, "space");
 
-        this.getActionMap().put("up", new AbstractAction() {
+        // ENTER key
+        key = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        inputMap.put(key, "enter");
+
+        actionMap.put("up", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -102,7 +173,7 @@ public class ArenaView extends JPanel
             }
         });
 
-        this.getActionMap().put("down", new AbstractAction() {
+        actionMap.put("down", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -110,7 +181,7 @@ public class ArenaView extends JPanel
             }
         });
 
-        this.getActionMap().put("left", new AbstractAction() {
+        actionMap.put("left", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -118,15 +189,14 @@ public class ArenaView extends JPanel
             }
         });
 
-        this.getActionMap().put("right", new AbstractAction() {
+        actionMap.put("right", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 l.rightKey(e);
             }
         });
-
-        this.getActionMap().put("space", new AbstractAction() {
+        actionMap.put("space", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -134,7 +204,12 @@ public class ArenaView extends JPanel
             }
         });
 
+        actionMap.put("enter", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+                l.enterKey(e);
+            }
+        });
     }
-
 }

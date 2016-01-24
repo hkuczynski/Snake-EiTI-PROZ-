@@ -3,22 +3,25 @@ package model;
 import java.util.ArrayList;
 
 /**
- * Created by hubert on 22.01.2016.
+ * Klasa reprezentująca węża.
  */
 public class Snake
 {
+    public static final int startSize = 5; // Początkowa długość węża
     private BodyPart b;
     private ArrayList<BodyPart> bodyParts;
-    public final int startSize;
+
     private int xCoor = 20, yCoor = 20, size;
 
+    /*
+     * Konstruktor inicjalizuje listę części składowych węża, ustawia aktualny rozmiar na wartość
+     * rozmiaru początkowego i dodaje jedną część.
+     */
     public Snake()
     {
         bodyParts = new ArrayList<>();
-        startSize = 5;
         size = startSize;
         addPart();
-
     }
 
     public int getSize()
@@ -67,6 +70,9 @@ public class Snake
         bodyParts.add(b);
     }
 
+    /*
+     * Funkcja mająca za zadanie utrzymywać stałą liczbę części węża w zależności od aktualnego rozmiaru.
+     */
     public void updateSize()
     {
         while(bodyParts.size() > size)

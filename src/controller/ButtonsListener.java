@@ -3,7 +3,7 @@ package controller;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by hubert on 23.01.2016.
+ * Interfejs do przypisywania akcji przyciskom.
  */
 public interface ButtonsListener
 {
@@ -12,5 +12,5 @@ public interface ButtonsListener
     void leftKey(ActionEvent e);
     void rightKey(ActionEvent e);
     void spaceKey(ActionEvent e);
-
+    void enterKey(ActionEvent e);
 }
