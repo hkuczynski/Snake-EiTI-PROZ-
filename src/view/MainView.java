@@ -11,7 +11,7 @@ public class MainView extends JFrame
 {
     private final JPanel contentPanel;
 
-    /*
+    /**
      * Konstruktor MainView przyjmuje jako argumenty widoki, ktore będzie wyświetlał
      */
     public MainView(ArenaView arenaView, StatusView statusView)

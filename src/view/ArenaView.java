@@ -1,6 +1,6 @@
 package view;
 
-import controller.ButtonsListener;
+import controller.KeyListener;
 import model.*;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ public class ArenaView extends JPanel
     private static final Color FONT_COLOR = new Color(54, 57, 27);
     private final ArenaModel arenaModel;
 
-    /*
+    /**
      * Konstruktor ArenaView przyjmuje jako argument arenaModel, z którego pobiera wszystkie potrzebne informacje
      * np. instancję węża.
      */
@@ -35,7 +35,7 @@ public class ArenaView extends JPanel
         setBackground(new Color(143, 182, 103));
     }
 
-    /*
+    /**
      * Funkcja rysująca elementy takie jak: Snake, Fruit oraz wyśietlająca w razie potrzeby
      * informacje o stanie gry (początek, pauza, koniec).
      */
@@ -93,7 +93,7 @@ public class ArenaView extends JPanel
         }
     }
 
-    /*
+    /**
      * Funkcja wyświetlająca napisy poitalne.
      */
     private void showStartingMessage(Graphics g)
@@ -105,7 +105,7 @@ public class ArenaView extends JPanel
         g.drawString(largeMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(largeMessage) / 2, HEIGHT / 2 - 50);
     }
 
-    /*
+    /**
      * Funkcja wyświetlająca napisy w trakcie wstrzymania rozgrywki.
      */
     private void showPauseMessage(Graphics g)
@@ -119,7 +119,7 @@ public class ArenaView extends JPanel
         g.drawString(smallMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(smallMessage) / 2, HEIGHT / 2 + 50);
     }
 
-    /*
+    /**
      * Funkcja wyświtlająca napisy po porażce.
      */
     private void showEndMessage(Graphics g)
@@ -133,10 +133,10 @@ public class ArenaView extends JPanel
         g.drawString(smallMessage, WIDTH / 2 - g.getFontMetrics().stringWidth(smallMessage) / 2, HEIGHT / 2 + 50);
     }
 
-    /*
+    /**
      * Funkcja przypisująca akcje dla konkretnych klawiszy
      */
-    public void addBindings(ButtonsListener l)
+    public void addBindings(KeyListener l)
     {
         InputMap inputMap = getInputMap();
         ActionMap actionMap = getActionMap();

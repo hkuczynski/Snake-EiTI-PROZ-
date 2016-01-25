@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 /**
  * Interfejs do przypisywania akcji przyciskom.
  */
-public interface ButtonsListener
+public interface KeyListener
 {
     void upKey(ActionEvent e);
     void downKey(ActionEvent e);

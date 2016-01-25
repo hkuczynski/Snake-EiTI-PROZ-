@@ -18,7 +18,7 @@ public class StatusView extends JPanel
     private JLabel scoreLabel;
     private int score;
 
-    /*
+    /**
      * Konstruktor StatusView przyjmuje jako argument arenaModel, z którego będzie pobierał
      * ilość zdobytych punktów
      */

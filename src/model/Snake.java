@@ -13,7 +13,7 @@ public class Snake
 
     private int xCoor = 20, yCoor = 20, size;
 
-    /*
+    /**
      * Konstruktor inicjalizuje listę części składowych węża, ustawia aktualny rozmiar na wartość
      * rozmiaru początkowego i dodaje jedną część.
      */
@@ -70,7 +70,7 @@ public class Snake
         bodyParts.add(b);
     }
 
-    /*
+    /**
      * Funkcja mająca za zadanie utrzymywać stałą liczbę części węża w zależności od aktualnego rozmiaru.
      */
     public void updateSize()

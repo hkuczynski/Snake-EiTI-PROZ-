@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Kontroler. Steruje całą logiką gry oraz przepływam danych między widokami a modelem.
  */
-public class GameController implements Runnable, ButtonsListener
+public class GameController implements Runnable, KeyListener
 {
     private final int MAX_DIRECTIONS = 3; // maksymalna liczba kierunków będących w liście directions
     private final ArenaModel arenaModel;
@@ -20,9 +20,8 @@ public class GameController implements Runnable, ButtonsListener
     private LinkedList<Direction> directions; // lista kierunków, jakie wcisnął gracz
     private Thread gameThread;
     private Timer timer;
-    Random generator = new Random(); // potrzebny do generowania losowych współrzędnych
 
-    /*
+    /**
      * Konstruktor przyjmuje jako argumenty model oraz widoki. Ustawia akcje dla klawiszy, tworzy listę
      * kierunków i dodaje do niej kierunek w górę. Na końcu uruchamia funkcję start, która tworzy wątek dla pętli gry.
      */
@@ -43,7 +42,7 @@ public class GameController implements Runnable, ButtonsListener
         gameThread.start();
     }
 
-    /*
+    /**
      * "Pętla" gry.
      */
     public void run()
@@ -55,10 +54,16 @@ public class GameController implements Runnable, ButtonsListener
             {
                 if(arenaModel.getGameState() == GameState.RUNNING)
                 {
-                    updateSnake();
-                    updateFood();
-                    checkIfEaten();
-                    checkSelfCollision();
+                    arenaModel.updateSnake(directions.peek());
+
+                    if(directions.size() > 1)
+                    {
+                        directions.poll();
+                    }
+
+                    arenaModel.updateFood();
+                    arenaModel.checkIfEaten();
+                    arenaModel.checkSelfCollision();
 
                     arenaView.repaint();
                     statusView.update();
@@ -67,162 +72,9 @@ public class GameController implements Runnable, ButtonsListener
         },0,  100 );
     }
 
-    /*
-     * Funkcja zmieniająca położenie węża w zależności od kierunku w którym ma się poruszać.
-     * Dodaje nową część na początku węża.
-     */
-    public void updateSnake()
-    {
-        Snake snake = arenaModel.getSnake();
-        int arenaWidth = ArenaModel.WIDTH;
-        int arenaHeight = ArenaModel.HEIGHT;
-        Direction direction = directions.peekFirst();
 
-        switch(direction)
-        {
-            case RIGHT:
-                if (snake.getxCoor() <= 0)
-                {
-                    snake.setxCoor(arenaWidth);
-                }
-                else
-                {
-                    snake.setxCoor(snake.getxCoor() - 1);
-                }
-                break;
-            case LEFT:
-                if (snake.getxCoor() >= arenaWidth)
-                {
-                    snake.setxCoor(0);
-                }
-                else
-                {
-                    snake.setxCoor(snake.getxCoor() + 1);
-                }
-                break;
-            case UP:
-                if (snake.getyCoor() <= 0)
-                {
-                    snake.setyCoor(arenaHeight);
-                }
-                else
-                {
-                    snake.setyCoor(snake.getyCoor() - 1);
-                }
-                break;
-            case DOWN:
-                if (snake.getyCoor() >= arenaHeight)
-                {
-                    snake.setyCoor(0);
-                }
-                else
-                {
-                    snake.setyCoor(snake.getyCoor() + 1);
-                }
-                break;
-        }
 
-        if(directions.size() > 1)
-        {
-            directions.poll();
-        }
-
-        snake.addPart();
-        snake.updateSize();
-
-        arenaModel.setSnake(snake);
-    }
-
-    /*
-     * Funkcja tworząca nowe owoce. Zostają one dodane jeżeli na planszy pozostanie mniej niż 4.
-     */
-    public void updateFood()
-    {
-        int xCoor, yCoor, partSnakeX, partSnakeY;
-        boolean collision = false;
-        Snake snake = arenaModel.getSnake();
-
-        if(arenaModel.getFruitList().size() < 4)
-        {
-            xCoor = generator.nextInt(ArenaModel.WIDTH);
-            yCoor = generator.nextInt(ArenaModel.HEIGHT);
-
-            for(int i = 0; i < snake.getSize() - 1; i++)
-            {
-                partSnakeX = snake.getPart(i).getxCoor();
-                partSnakeY = snake.getPart(i).getyCoor();
-
-                if(partSnakeX == xCoor && partSnakeY == yCoor)
-                {
-                   collision = true;
-                }
-            }
-
-            if(!collision)
-            {
-                arenaModel.addFood(new Fruit(xCoor, yCoor));
-            }
-
-        }
-    }
-
-    /*
-     * Funkcja sprawdzająca czy wąż najechał na owoc.
-     */
-    public void checkIfEaten()
-    {
-        Snake snake = arenaModel.getSnake();
-        BodyPart snakesHead = snake.getPart(snake.getSize() - 1);
-        ArrayList<Fruit> fruitList = arenaModel.getFruitList();
-        int foodXCoor, foodYCoor, headXCoor, headYCoor, score;
-
-        headXCoor = snakesHead.getxCoor();
-        headYCoor = snakesHead.getyCoor();
-
-        for(int i = 0; i < fruitList.size(); i++)
-        {
-            foodXCoor = fruitList.get(i).getxCoor();
-            foodYCoor = fruitList.get(i).getyCoor();
-
-            if(foodXCoor == headXCoor && foodYCoor == headYCoor)
-            {
-                arenaModel.removeFood(i);
-                arenaModel.incrementSnakeSize();
-
-                score = arenaModel.getScore();
-                arenaModel.setScore(score + 1);
-            }
-        }
-
-    }
-
-    /*
-     * Funkcja sprawdzająca czy wąż najechał na siebie.
-     */
-    public void checkSelfCollision()
-    {
-        Snake snake = arenaModel.getSnake();
-        BodyPart snakesHead = snake.getPart(snake.getSize() - 1);
-        int partXCoor, partYCoor, headXCoor, headYCoor;
-
-        headXCoor = snakesHead.getxCoor();
-        headYCoor = snakesHead.getyCoor();
-
-        for(int i = 0; i < snake.getSize() - 1; i++)
-        {
-            partXCoor = snake.getPart(i).getxCoor();
-            partYCoor = snake.getPart(i).getyCoor();
-
-            if(partXCoor == headXCoor && partYCoor == headYCoor)
-            {
-                snake.resetSize();
-                arenaModel.setSnake(snake);
-                gameEnd();
-            }
-        }
-    }
-
-    /*
+    /**
      * Funkcja obsługująca wstrzymywanie gry.
      */
     private void gamePause()
@@ -232,25 +84,17 @@ public class GameController implements Runnable, ButtonsListener
         timer.cancel();
     }
 
-    /*
- * Funkcja obsługująca wznawianie gry.
- */
+    /**
+     * Funkcja obsługująca wznawianie gry.
+     */
     private void gameResume()
     {
         arenaModel.setGameState(GameState.RUNNING);
         run();
     }
 
-    /*
-     * Funkcja obsługująca kończenie gry.
-     */
-    private void gameEnd()
-    {
-        arenaModel.setGameState(GameState.ENDED);
 
-    }
-
-    /*
+    /**
      * Funkcja obsługująca restartowanie gry.
      */
     private void restartGame()
@@ -262,7 +106,7 @@ public class GameController implements Runnable, ButtonsListener
         directions.add(Direction.UP);
     }
 
-    /*
+    /**
      * Funkcja wywołująca odpowiednie akcje w zależności od wciśniętego przycisku.
      */
     private void move(Direction d) {
@@ -304,7 +148,7 @@ public class GameController implements Runnable, ButtonsListener
         }
     }
 
-    /*
+    /**
      * Poniżej znajdują się przypisania akcji do konkretnych przycisków
      */
 
